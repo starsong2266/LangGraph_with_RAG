@@ -4,7 +4,7 @@
 
 ## 系統架構
 
-![Flowchart](docs/Flowchart.jpg)
+![Flowchart](Flowchart.jpg)
 
 ### 主要流程
 
