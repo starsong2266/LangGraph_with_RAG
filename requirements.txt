@@ -1,0 +1,29 @@
+# 核心套件
+langchain>=0.1.0
+langchain_core>=0.1.0
+langchain_community>=0.0.10
+langgraph>=0.0.10
+
+# LLM 相關
+langchain-google-genai>=0.0.5
+langchain-openai>=0.0.5
+
+# 向量資料庫
+langchain_chroma>=0.0.10
+chromadb>=0.4.0
+
+# PDF 處理
+pypdf>=3.0.0
+
+# API 請求
+requests>=2.31.0
+
+# 資料模型
+pydantic>=2.0.0
+typing-extensions>=4.5.0
+
+# 加密
+cryptography>=3.1
+
+# 工具
+tavily-python>=0.3.0
