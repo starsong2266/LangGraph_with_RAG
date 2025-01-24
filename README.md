@@ -1,91 +1,107 @@
 # LangGraph with RAG
 
-這是一個結合 LangGraph 和 RAG (Retrieval-Augmented Generation) 的問答系統，專門處理與交通法規相關的問題。
+A question-answering system combining LangGraph and RAG (Retrieval-Augmented Generation), specifically designed to handle queries about heavy motorcycles and traffic regulations.
 
-## 系統架構
+## System Architecture
 
-![Flowchart](Flowchart.jpg)
+![Flowchart](docs/images/Flowchart.jpg)
 
-### 主要流程
+### Main Flow
 
-1. **問題評估 (Grade Question)**
-   - 評估問題是否適合回答（過濾不當內容）
-   - 如果問題合適，進入路由階段
+1. **Question Assessment (Grade Question)**
+   - Evaluates whether questions are appropriate (filters inappropriate content)
+   - If appropriate, proceeds to routing stage
 
-2. **問題路由 (Route Question)**
-   - 根據問題內容決定使用哪種資料來源：
-     - Vectorstore：用於交通法規相關問題
-     - Web Search：用於一般性問題
-     - Plain Answer：直接使用 LLM 回答
+2. **Question Routing (Route Question)**
+   - Determines data source based on question content:
+     - Vectorstore: For traffic regulation queries
+     - Web Search: For general queries
+     - Plain Answer: Direct LLM response
 
-3. **資料檢索 (Retrieval)**
-   - Vectorstore：從本地向量資料庫檢索相關文件
-   - Web Search：使用 Tavily 搜尋網路資訊
+3. **Data Retrieval (Retrieval)**
+   - Vectorstore: Retrieves relevant documents from local vector database
+   - Web Search: Uses Tavily for web information search
 
-4. **檢索評分 (Retrieval Grader)**
-   - 評估檢索到的文件是否與問題相關
-   - 如果沒有相關文件，可能會重試或轉向其他方式
+4. **Retrieval Grading (Retrieval Grader)**
+   - Evaluates retrieval result relevance
+   - Supports retry mechanism (maximum once)
 
-5. **回答生成 (RAG Responder)**
-   - 使用 RAG 技術生成回答
-   - 包含幻覺檢查和答案品質評估
+5. **Answer Generation (RAG Responder)**
+   - Uses GPT-4o-mini with vector database for answer generation
+   - Includes hallucination detection and quality assessment
 
-## 專案結構 
+## Project Structure
 
 ```
 LangGraph_with_RAG/
-├── config/ # 配置文件
-│ └── config.py # API 金鑰和環境設定
-├── data/ # 資料處理
-│ └── data.py # 資料載入和向量資料庫建立
-├── models/ # 資料模型
-│ └── state.py # 狀態定義
-├── nodes/ # 工作流程節點
-│ ├── generators.py # 回答生成
-│ ├── graders.py # 評分和路由
-│ └── retrievers.py # 資料檢索
-├── services/ # 核心服務
-│ ├── embeddings.py # 向量嵌入
-│ ├── llm.py # LLM 服務
-│ └── llm_model.py # LLM 模型定義
-└── docs/ # 文檔
-└── images/ # 圖片資源
+├── config/             # Configuration files
+│   └── config.py      # Environment variable setup
+├── data/              # Data processing
+│   └── data.py        # PDF loading and vector database
+├── models/            # Data models
+│   └── state.py       # State definitions
+├── nodes/             # Workflow nodes
+│   ├── generators.py  # Answer generation
+│   ├── graders.py     # Grading and routing
+│   └── retrievers.py  # Data retrieval
+├── services/          # Core services
+│   ├── embeddings.py  # Google Embeddings
+│   ├── llm.py        # LLM configuration
+│   └── llm_model.py  # LLM grading models
+└── docs/             # Documentation
+    └── images/       # Image resources
 ```
 
-### 主要組件說明
+## Models and Services Used
 
-#### 1. 核心服務 (services/)
-- **llm.py**: 提供 Azure OpenAI 
-- **embeddings.py**: 處理文件向量化
-- **llm_model.py**: 定義各種 LLM 評分和路由模型
+1. **Language Model**
+   - OpenAI GPT-4o-mini
 
-#### 2. 工作流程節點 (nodes/)
-- **generators.py**: 實現 RAG 和一般回答生成
-- **graders.py**: 處理問題評估、路由和品質控制
-- **retrievers.py**: 實現向量檢索和網路搜尋
+2. **Vector Embeddings**
+   - Google Generative AI Embeddings (models/embedding-001)
 
-#### 3. 資料處理 (data/)
-- **data.py**: 負責載入 PDF 文件和建立向量資料庫
+3. **External Services**
+   - Tavily Search API
+   - Google AI API
+   - OpenAI API
 
-## 特色功能
+## Installation and Setup
 
-1. **多重資料來源整合**
-   - 本地向量資料庫（交通法規文件）
-   - Tavily 網路搜尋（即時資訊）
-   - LLM 直接回答（一般性問題）
+1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-2. **完整的品質控制機制**
-   - 問題內容過濾
-   - 檢索結果相關性評分
-   - 幻覺檢測
-   - 答案品質評估
-   - 智能重試機制
+2. Environment variables setup (.env):
+```
+OPENAI_API_KEY=your-openai-api-key
+GOOGLE_API_KEY=your-google-api-key
+TAVILY_API_KEY=your-tavily-api-key
+```
 
-3. **智能路由系統**
-   - 根據問題類型自動選擇最適合的資料來源
-   - 失敗時自動切換到備選方案
-   - 最多重試一次，確保回應效率
+## Usage
 
-## 安裝與使用
+```python
+from main import run_query
 
-1. 安裝依賴：
+# Execute query
+question = "What are the regulations for license renewal?"
+answer = run_query(question)
+print(answer)
+```
+
+## Key Features
+
+1. **Intelligent Routing**
+   - Automatically selects the most suitable data source
+   - Supports multiple data source integration
+
+2. **Quality Control**
+   - Content filtering
+   - Relevance scoring
+   - Hallucination detection
+   - Answer quality assessment
+
+3. **Error Handling**
+   - Intelligent retry mechanism
+   - Fallback options

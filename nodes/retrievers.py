@@ -1,6 +1,7 @@
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain.schema import Document
 from data.data import retrieve_documents
+from config.config import TAVILY_API_KEY
 
 
 def web_search(state):
@@ -9,7 +10,7 @@ def web_search(state):
     question = state["question"]
     documents = state.get("documents", [])
 
-    search_tool = TavilySearchResults()
+    search_tool = TavilySearchResults(api_key=TAVILY_API_KEY)
     results = search_tool.invoke({"query": question})
     web_results = [Document(page_content=d["content"]) for d in results]
 

@@ -1,8 +1,9 @@
-from langgraph.graph import StateGraph, END
-from models.state import GraphState
-from nodes.graders import route_question, retrieval_grade, route_retrieval, grade_rag_generation
-from nodes.retrievers import web_search, retrieve
+from services.llm import get_openai_llm
 from nodes.generators import rag_generate, plain_answer
+from nodes.retrievers import web_search, retrieve
+from nodes.graders import route_question, retrieval_grade, route_retrieval, grade_rag_generation
+from models.state import GraphState
+from langgraph.graph import StateGraph, END
 
 
 def create_workflow():

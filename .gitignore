@@ -1,0 +1,23 @@
+# 環境變數
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虛擬環境
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+
+# 系統檔案
+.DS_Store
+
+# 向量資料庫
+*.sqlite3
+*.db 

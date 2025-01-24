@@ -1,5 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
-from services.llm import get_azure_llm, get_gemini_llm
+from services.llm import get_openai_llm
 from langchain_core.output_parsers import StrOutputParser
 
 
@@ -26,7 +26,7 @@ def rag_generate(state):
 
     # LLM & chain
     # llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0.7)
-    llm = get_azure_llm()
+    llm = get_openai_llm()
     rag_chain = prompt | llm | StrOutputParser()
 
     # RAG generation
@@ -54,7 +54,7 @@ def plain_answer(state):
     )
 
     # LLM & chain
-    llm = get_azure_llm()
+    llm = get_openai_llm()
     llm_chain = prompt | llm | StrOutputParser()
 
     generation = llm_chain.invoke({"question": question})

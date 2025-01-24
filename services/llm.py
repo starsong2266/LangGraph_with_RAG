@@ -1,16 +1,14 @@
-from langchain_openai import AzureChatOpenAI
+from langchain_openai import ChatOpenAI
 from langchain_google_genai import ChatGoogleGenerativeAI
-from config.config import AZURE_ENDPOINT, AZURE_DEPLOYMENT, AZURE_API_VERSION
-import os
+from config.config import OPENAI_API_KEY  # 從 config 引入
 
 
-def get_azure_llm():
-    """獲取 Azure OpenAI LLM"""
-    return AzureChatOpenAI(
-        azure_endpoint=AZURE_ENDPOINT,
-        azure_deployment=AZURE_DEPLOYMENT,
-        openai_api_version=AZURE_API_VERSION,
-        api_key=os.environ["OPENAI_API_KEY"]
+def get_openai_llm():
+    """獲取 OpenAI LLM"""
+    return ChatOpenAI(
+        model="gpt-4o-mini",
+        temperature=0.7,
+        api_key=OPENAI_API_KEY
     )
 
 
