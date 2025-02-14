@@ -7,4 +7,5 @@ class GraphState(TypedDict):
     question: str
     generation: Optional[str]
     documents: Optional[List[Document]]
-    retry_count: Optional[int]
+    web_search_retry_count: Optional[int]
+    rag_generate_retry_count: Optional[int]
