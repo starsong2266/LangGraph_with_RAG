@@ -55,7 +55,28 @@ def retrieval_grade(state):
         else:
             print("  -GRADE: DOCUMENT NOT RELEVANT-")
             continue
-    return {"documents": filtered_docs, "question": question}
+
+    state["documents"] = filtered_docs
+    return state
+
+
+def route_retrieval(state):
+    """決定是否生成答案或使用網路搜尋"""
+    print("---ROUTE RETRIEVAL---")
+    documents = state["documents"]
+    retry_count = state["retry_count"]
+
+    if not documents:
+        print("  -NO RELEVANT DOCUMENTS FOUND-")
+        if retry_count >= 1:
+            print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
+            return "plain_answer"
+        state["retry_count"] = retry_count + 1
+        print("  -RETRY WITH WEB SEARCH-")
+        return "web_search"
+
+    print("  -RELEVANT DOCUMENTS FOUND, GENERATING ANSWER-")
+    return "rag_generate"
 
 
 def grade_rag_generation(state):
@@ -64,7 +85,7 @@ def grade_rag_generation(state):
     question = state["question"]
     documents = state["documents"]
     generation = state["generation"]
-    retry_count = state.get("retry_count", 0)
+    retry_count = state["retry_count"]
 
     score = hallucination_grader.invoke(
         {"documents": documents, "generation": generation})
@@ -95,22 +116,3 @@ def grade_rag_generation(state):
             return "plain_answer"
         state["retry_count"] = retry_count + 1
         return "not supported"
-
-
-def route_retrieval(state):
-    """決定是否生成答案或使用網路搜尋"""
-    print("---ROUTE RETRIEVAL---")
-    documents = state["documents"]
-    retry_count = state.get("retry_count", 0)
-
-    if not documents:
-        print("  -NO RELEVANT DOCUMENTS FOUND-")
-        if retry_count >= 1:
-            print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
-            return "plain_answer"
-        state["retry_count"] = retry_count + 1
-        print("  -RETRY WITH WEB SEARCH-")
-        return "web_search"
-
-    print("  -RELEVANT DOCUMENTS FOUND, GENERATING ANSWER-")
-    return "rag_generate"

@@ -15,7 +15,8 @@ def web_search(state):
     web_results = [Document(page_content=d["content"]) for d in results]
 
     documents.extend(web_results)
-    return {"documents": documents, "question": question}
+    state["documents"] = documents
+    return state
 
 
 def retrieve(state):
@@ -26,4 +27,5 @@ def retrieve(state):
     retriever = retrieve_documents()
     documents = retriever.invoke(question)
 
-    return {"documents": documents, "question": question}
+    state["documents"] = documents
+    return state

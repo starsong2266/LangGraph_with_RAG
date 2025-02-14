@@ -32,7 +32,10 @@ def rag_generate(state):
     # RAG generation
     generation = rag_chain.invoke(
         {"documents": documents, "question": question})
-    return {"documents": documents, "question": question, "generation": generation}
+
+    # 更新狀態並返回
+    state["generation"] = generation
+    return state
 
 
 def plain_answer(state):
@@ -48,8 +51,8 @@ def plain_answer(state):
 
     prompt = ChatPromptTemplate.from_messages(
         [
-            ("system",instruction),
-            ("human","問題: {question}"),
+            ("system", instruction),
+            ("human", "問題: {question}"),
         ]
     )
 
@@ -58,4 +61,7 @@ def plain_answer(state):
     llm_chain = prompt | llm | StrOutputParser()
 
     generation = llm_chain.invoke({"question": question})
-    return {"question": question, "generation": generation}
+
+    # 更新狀態並返回
+    state["generation"] = generation
+    return state
