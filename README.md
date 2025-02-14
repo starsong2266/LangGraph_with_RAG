@@ -34,7 +34,10 @@ A question-answering system combining LangGraph and RAG (Retrieval-Augmented Gen
 
 ```
 LangGraph_with_RAG/
-├── config/             # Configuration files
+├── frontend/           # React frontend application
+│   ├── public/        # Static files
+│   └── src/           # React source code
+├── config/            # Configuration files
 │   └── config.py      # Environment variable setup
 ├── data/              # Data processing
 │   └── data.py        # PDF loading and vector database
@@ -52,43 +55,42 @@ LangGraph_with_RAG/
     └── images/       # Image resources
 ```
 
-## Models and Services Used
-
-1. **Language Model**
-   - OpenAI GPT-4o-mini
-
-2. **Vector Embeddings**
-   - Google Generative AI Embeddings (models/embedding-001)
-
-3. **External Services**
-   - Tavily Search API
-   - Google AI API
-   - OpenAI API
-
 ## Installation and Setup
 
-1. Install dependencies:
+1. Install backend dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Environment variables setup (.env):
+2. Install frontend dependencies:
+```bash
+cd frontend
+npm install
+```
+
+3. Environment variables setup (.env):
 ```
 OPENAI_API_KEY=your-openai-api-key
 GOOGLE_API_KEY=your-google-api-key
 TAVILY_API_KEY=your-tavily-api-key
 ```
 
-## Usage
+## Running the Application
 
-```python
-from main import run_query
-
-# Execute query
-question = "What are the regulations for license renewal?"
-answer = run_query(question)
-print(answer)
+1. Start the backend server:
+```bash
+python app.py
 ```
+
+2. Start the frontend development server:
+```bash
+cd frontend
+npm start
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
 
 ## Key Features
 
@@ -105,3 +107,24 @@ print(answer)
 3. **Error Handling**
    - Intelligent retry mechanism
    - Fallback options
+
+4. **User Interface**
+   - React-based frontend
+   - Responsive design
+   - Real-time error handling
+   - Loading state indicators
+
+## Technologies Used
+
+### Backend
+- FastAPI
+- LangGraph
+- OpenAI GPT
+- Google AI
+- Tavily Search API
+
+### Frontend
+- React
+- Create React App
+- Modern CSS
+- Fetch API
