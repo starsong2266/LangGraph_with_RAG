@@ -4,7 +4,60 @@ A question-answering system combining LangGraph and RAG (Retrieval-Augmented Gen
 
 ## System Architecture
 
-![Flowchart](docs/images/Flowchart.jpg)
+```mermaid
+graph TD
+    Question[Question] --> GradeQuestion{Grade Question}
+    
+    GradeQuestion -->|No| NoAnswer[No Answer]
+    GradeQuestion -->|Yes| RouteQuestion{Route Question}
+    
+    RouteQuestion -->|Vectorstore| Retrieve[Retrieve]
+    RouteQuestion -->|Web Search| WebSearch[Web Search]
+    RouteQuestion -->|Plain Answer| PlainAnswer[Plain Answer]
+    
+    Retrieve --> RetrievalGrader[Retrieval Grader]
+    WebSearch --> RetrievalGrader
+    
+    RetrievalGrader --> RouteRetrieval{Route Retrieval}
+    
+    RouteRetrieval -->|Empty & web_retry < 1| UpdateWebSearch[Update Web Search Count]
+    RouteRetrieval -->|Empty & web_retry >= 1| PlainAnswer
+    RouteRetrieval -->|Non-Empty| RAGResponder[RAG Responder]
+    
+    UpdateWebSearch --> WebSearch
+    
+    RAGResponder --> HallucinationGrader{Hallucination Check}
+    
+    HallucinationGrader -->|No| AnswerGrader{Answer Quality}
+    HallucinationGrader -->|Yes & rag_retry < 1| UpdateRAGGenerate[Update RAG Count]
+    HallucinationGrader -->|Yes & rag_retry >= 1| PlainAnswer
+    
+    UpdateRAGGenerate --> RAGResponder
+    
+    AnswerGrader -->|Yes| Answer[Answer]
+    AnswerGrader -->|No & web_retry < 1| UpdateWebSearch
+    AnswerGrader -->|No & web_retry >= 1| PlainAnswer
+    
+    PlainAnswer --> Answer
+
+    style GradeQuestion fill:#ff69b4
+    style RouteQuestion fill:#ff69b4
+    style RouteRetrieval fill:#ff69b4
+    style HallucinationGrader fill:#ff69b4
+    style AnswerGrader fill:#ff69b4
+    
+    style Retrieve fill:#98fb98
+    style WebSearch fill:#98fb98
+    style RetrievalGrader fill:#98fb98
+    style RAGResponder fill:#98fb98
+    style UpdateWebSearch fill:#98fb98
+    style UpdateRAGGenerate fill:#98fb98
+    style PlainAnswer fill:#98fb98
+    
+    style Question fill:#fff
+    style NoAnswer fill:#fff
+    style Answer fill:#fff
+```
 
 ### Main Flow
 
@@ -18,17 +71,15 @@ A question-answering system combining LangGraph and RAG (Retrieval-Augmented Gen
      - Web Search: For general queries
      - Plain Answer: Direct LLM response
 
-3. **Data Retrieval (Retrieval)**
-   - Vectorstore: Retrieves relevant documents from local vector database
-   - Web Search: Uses Tavily for web information search
+3. **Data Retrieval & Processing**
+   - Vectorstore/Web Search retrieval
+   - Retrieval grading with retry mechanism
+   - RAG response generation with quality checks
 
-4. **Retrieval Grading (Retrieval Grader)**
-   - Evaluates retrieval result relevance
-   - Supports retry mechanism (maximum once)
-
-5. **Answer Generation (RAG Responder)**
-   - Uses GPT-4o-mini with vector database for answer generation
-   - Includes hallucination detection and quality assessment
+4. **Quality Control**
+   - Web search retry count tracking
+   - RAG generation retry count tracking
+   - Multiple fallback options to ensure quality
 
 ## Project Structure
 
@@ -47,12 +98,10 @@ LangGraph_with_RAG/
 │   ├── generators.py  # Answer generation
 │   ├── graders.py     # Grading and routing
 │   └── retrievers.py  # Data retrieval
-├── services/          # Core services
-│   ├── embeddings.py  # Google Embeddings
-│   ├── llm.py        # LLM configuration
-│   └── llm_model.py  # LLM grading models
-└── docs/             # Documentation
-    └── images/       # Image resources
+└── services/          # Core services
+    ├── embeddings.py  # Google Embeddings
+    ├── llm.py        # LLM configuration
+    └── llm_model.py  # LLM grading models
 ```
 
 ## Installation and Setup
