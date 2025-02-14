@@ -54,8 +54,24 @@ def retrieval_grade(state):
             filtered_docs.append(d)
         else:
             print("  -GRADE: DOCUMENT NOT RELEVANT-")
-            continue
-    return {"documents": filtered_docs, "question": question}
+
+    # 更新 state 並回傳
+    state["documents"] = filtered_docs
+    return state
+
+
+def update_web_search(state):
+    """更新重試次數"""
+    retry_count = state["web_search_retry_count"]
+    state["web_search_retry_count"] = retry_count + 1
+    return state
+
+
+def update_rag_generate(state):
+    """更新重試次數"""
+    retry_count = state["rag_generate_retry_count"]
+    state["rag_generate_retry_count"] = retry_count + 1
+    return state
 
 
 def grade_rag_generation(state):
@@ -64,7 +80,7 @@ def grade_rag_generation(state):
     question = state["question"]
     documents = state["documents"]
     generation = state["generation"]
-    retry_count = state.get("retry_count", 0)
+    retry_count = state["rag_generate_retry_count"]
 
     score = hallucination_grader.invoke(
         {"documents": documents, "generation": generation})
@@ -86,14 +102,12 @@ def grade_rag_generation(state):
             if retry_count >= 1:
                 print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
                 return "plain_answer"
-            state["retry_count"] = retry_count + 1
             return "not useful"
     else:
         print("  -DECISION: GENERATION IS NOT GROUNDED IN DOCUMENTS, RE-TRY-")
         if retry_count >= 1:
             print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
             return "plain_answer"
-        state["retry_count"] = retry_count + 1
         return "not supported"
 
 
@@ -101,14 +115,14 @@ def route_retrieval(state):
     """決定是否生成答案或使用網路搜尋"""
     print("---ROUTE RETRIEVAL---")
     documents = state["documents"]
-    retry_count = state.get("retry_count", 0)
+    retry_count = state["web_search_retry_count"]
 
     if not documents:
         print("  -NO RELEVANT DOCUMENTS FOUND-")
         if retry_count >= 1:
             print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
             return "plain_answer"
-        state["retry_count"] = retry_count + 1
+
         print("  -RETRY WITH WEB SEARCH-")
         return "web_search"
 
