@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from nodes.generators import rag_generate, plain_answer
 from nodes.retrievers import web_search, retrieve
-from nodes.graders import route_question, retrieval_grade, route_retrieval, grade_rag_generation
+from nodes.graders import route_question, retrieval_grade, route_retrieval, grade_rag_generation, update_web_search, update_rag_generate
 from models.state import GraphState
 from langgraph.graph import StateGraph, END
 
@@ -19,6 +19,8 @@ def create_workflow():
     workflow.add_node("retrieval_grade", retrieval_grade)
     workflow.add_node("rag_generate", rag_generate)
     workflow.add_node("plain_answer", plain_answer)
+    workflow.add_node("update_web_search", update_web_search)
+    workflow.add_node("update_rag_generate", update_rag_generate)
 
     # 設置條件入口
     workflow.set_conditional_entry_point(
@@ -34,11 +36,14 @@ def create_workflow():
     workflow.add_edge("retrieve", "retrieval_grade")
     workflow.add_edge("web_search", "retrieval_grade")
 
+    workflow.add_edge("update_web_search", "web_search")
+    workflow.add_edge("update_rag_generate", "rag_generate")
+
     workflow.add_conditional_edges(
         "retrieval_grade",
         route_retrieval,
         {
-            "web_search": "web_search",
+            "web_search": "update_web_search",
             "rag_generate": "rag_generate",
             "plain_answer": "plain_answer",
         },
@@ -48,8 +53,8 @@ def create_workflow():
         "rag_generate",
         grade_rag_generation,
         {
-            "not supported": "rag_generate",
-            "not useful": "web_search",
+            "not supported": "update_rag_generate",
+            "not useful": "update_web_search",
             "useful": END,
             "plain_answer": "plain_answer",
         },
