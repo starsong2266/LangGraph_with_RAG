@@ -124,8 +124,30 @@ GOOGLE_API_KEY=your-google-api-key
 TAVILY_API_KEY=your-tavily-api-key
 ```
 
+## Database Setup
+
+### Using Docker (Recommended)
+1. Start the database using Docker Compose:
+```bash
+cd Docker
+docker-compose up -d postgres_memory
+```
+
+2. Environment variables setup (.env):
+```
+DB_URI="postgresql://postgres:postgres@localhost:5432/postgres"
+```
+
 ## Running the Application
 
+### Using Docker
+1. Start all services:
+```bash
+cd Docker
+docker-compose up
+```
+
+### Manual Setup
 1. Start the backend server:
 ```bash
 python app.py
