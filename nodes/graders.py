@@ -80,7 +80,8 @@ def grade_rag_generation(state):
     question = state["question"]
     documents = state["documents"]
     generation = state["generation"]
-    retry_count = state["rag_generate_retry_count"]
+    rag_generate_retry_count = state["rag_generate_retry_count"]
+    web_search_retry_count = state["web_search_retry_count"]
 
     score = hallucination_grader.invoke(
         {"documents": documents, "generation": generation})
@@ -99,13 +100,13 @@ def grade_rag_generation(state):
             return "useful"
         else:
             print("  -DECISION: GENERATION DOES NOT ADDRESS QUESTION-")
-            if retry_count >= 1:
+            if web_search_retry_count >= 1:
                 print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
                 return "plain_answer"
             return "not useful"
     else:
         print("  -DECISION: GENERATION IS NOT GROUNDED IN DOCUMENTS, RE-TRY-")
-        if retry_count >= 1:
+        if rag_generate_retry_count >= 1:
             print("  -MAX RETRIES REACHED, USING PLAIN ANSWER-")
             return "plain_answer"
         return "not supported"
