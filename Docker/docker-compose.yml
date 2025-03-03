@@ -1,0 +1,33 @@
+version: '3.8'
+
+name: langgraph-rag  # 添加專案名稱
+
+services:
+  backend:
+    build:
+      context: ..        # 設置構建上下文為上層目錄
+      dockerfile: Docker/Dockerfile  # 指定 Dockerfile 位置
+    container_name: langgraph-backend  # 給容器一個固定名稱
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_URI=postgresql://postgres:postgres@postgres_memory:5432/postgres
+    depends_on:
+      - postgres_memory
+
+  # 使用原有的 PostgreSQL
+  postgres_memory:
+    image: postgres:14
+    container_name: langgraph-postgres  # 給容器一個固定名稱
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_memory_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_memory_data:  # 定義一個資料卷
+    name: langgraph-postgres-data  # 給這個資料卷一個名字 

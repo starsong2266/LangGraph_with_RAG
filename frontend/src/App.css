@@ -78,4 +78,24 @@ button:disabled {
   60% { content: "..."; }
   80% { content: "...."; }
   100% { content: "....."; }
+}
+
+.history-section {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.history-item {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-left: 4px solid #4CAF50;
+  background-color: white;
+}
+
+.timestamp {
+  color: #666;
+  font-size: 0.8em;
+  margin-top: 5px;
 } 

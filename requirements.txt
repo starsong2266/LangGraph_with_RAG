@@ -27,3 +27,9 @@ cryptography>=3.1
 
 # 工具
 tavily-python>=0.3.0
+
+# PostgreSQL
+psycopg>=3.2.0
+psycopg-pool>=3.2.0
+psycopg2-binary>=2.9.9
+langgraph-checkpoint-postgres>=2.0.15
